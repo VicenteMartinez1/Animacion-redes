@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Simulador de Redes - Conteo Máximo">
+    <meta property="og:description" content="Animación interactiva del bucle al infinito y su solución.">
+    <meta property="og:type" content="website">
+    
+    <title>Simulador de Redes - Grupo 1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #0d1117; display: flex; justify-content: center; align-items: center;
+            height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden;
+        }
+
+        .canva-frame {
+            width: 100%; max-width: 1280px; aspect-ratio: 16 / 9;
+            background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .narrator-box {
+            background: #0d1117; border-bottom: 1px solid #30363d; padding: 15px 30px;
+            display: flex; flex-direction: column; justify-content: center; min-height: 110px;
+            transition: border-left 0.3s; border-left: 6px solid #3b82f6;
+        }
+        .narrator-box.border-blue { border-left-color: #3b82f6; }
+        .narrator-box.border-red { border-left-color: #f85149; background: rgba(248,81,73,0.05); }
+        .narrator-box.border-yellow { border-left-color: #d29922; background: rgba(210,153,34,0.05); }
+        .narrator-box.border-green { border-left-color: #2ea043; background: rgba(46,160,67,0.05); }
+        
+        .n-title { color: #e6edf3; font-size: 16px; font-weight: 800; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .n-text { color: #8b949e; font-size: 14px; line-height: 1.4; }
+        .n-text b { color: #c9d1d9; }
+
+        .workspace { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+
+        .panel {
+            background: #21262d; border: 1px solid #30363d; border-radius: 10px;
+            display: flex; flex-direction: column; position: relative; padding: 15px 20px;
+        }
+        
+        .panel-header { text-align: center; margin-bottom: 25px; }
+        .panel-tag {
+            display: inline-block; padding: 6px 15px; border-radius: 6px; font-size: 13px;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .tag-red { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248,81,73,0.4); }
+        .tag-green { background: rgba(46, 160, 67, 0.1); color: #3fb950; border: 1px solid rgba(46,160,67,0.4); }
+
+        .topology-container {
+            position: relative; width: 100%; height: 90px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; margin-bottom: 30px;
+        }
+        
+        .cables-layer {
+            position: absolute; top: 50%; left: 40px; right: 40px; transform: translateY(-50%); display: flex; z-index: 1;
+        }
+        .cable { flex: 1; height: 4px; background: #3b82f6; transition: 0.3s; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+        .cable.broken { background: transparent; border-top: 3px dashed #f85149; box-shadow: none; }
+
+        .device { display: flex; flex-direction: column; align-items: center; z-index: 2; background: #21262d; padding: 0 10px; }
+        .icon-wrapper {
+            width: 45px; height: 45px; border-radius: 50%; background: #0d1117;
+            border: 2px solid #30363d; display: flex; justify-content: center; align-items: center;
+            font-size: 18px; color: #c9d1d9; margin-bottom: 5px; transition: 0.3s;
+        }
+        .device.router .icon-wrapper { color: #58a6ff; border-color: #1f6feb; }
+        .device.server .icon-wrapper { color: #8b949e; border-color: #484f58; }
+        .device.error .icon-wrapper { color: #f85149; border-color: #da3633; border-style: dashed; }
+        
+        .device-name { font-weight: 800; font-size: 13px; color: #e6edf3; }
+
+        .pdu { position: absolute; top: 50%; left: 0; transform: translateY(-50%); font-size: 20px; color: #d2a8ff; z-index: 5; opacity: 0; filter: drop-shadow(0 0 5px rgba(210, 168, 255, 0.6)); }
+
+        @keyframes sendRight { 0% { left: 40px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(50% - 10px); opacity: 0; } }
+        @keyframes sendLeft { 0% { left: calc(50% - 10px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 40px; opacity: 0; } }
+
+        .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .cli-table { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; overflow: hidden; }
+        .cli-head { background: #161b22; padding: 6px 10px; font-size: 11px; font-weight: 800; color: #8b949e; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; }
+        .cli-body { padding: 10px; }
+        .cli-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; transition: background 0.3s; padding: 4px 6px; border-radius: 4px; }
+        .cli-val { font-weight: 700; }
+        .val-red { color: #ff7b72; font-weight: 800;}
+        .highlight { background: rgba(56, 139, 253, 0.15); border: 1px solid #1f6feb; }
+
+        .convergence-overlay {
+            position: absolute; inset: 0; background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(4px); border-radius: 10px; z-index: 10;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; border: 1px solid #2ea043;
+        }
+        .convergence-overlay.active { opacity: 1; pointer-events: auto; }
+        .success-icon { font-size: 40px; color: #3fb950; margin-bottom: 15px; }
+        .success-title { color: #e6edf3; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+        .success-text { color: #8b949e; font-size: 14px; text-align: center; }
+
+        .bottom-bar { background: #161b22; border-top: 1px solid #30363d; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .iter-counter { background: #21262d; border: 1px solid #30363d; padding: 8px 15px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #c9d1d9; font-size: 14px; }
+        .buttons { display: flex; gap: 15px; }
+        button { padding: 10px 18px; border-radius: 6px; border: 1px solid transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-fail { background: #da3633; color: white; border-color: #f85149; }
+        .btn-fail:hover { background: #f85149; }
+        .btn-step { background: #238636; color: white; border-color: #2ea043; }
+        .btn-step:hover { background: #2ea043; }
+        .btn-auto { background: #1f6feb; color: white; border-color: #58a6ff; }
+        .btn-auto:hover { background: #388bfd; }
+        .btn-reset { background: transparent; color: #c9d1d9; border-color: #8b949e; }
+        .btn-reset:hover { background: #30363d; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; border-color: transparent; }
+
+    </style>
+</head>
+<body>
+
+<div class="canva-frame">
+    <div class="narrator-box border-blue" id="narrator">
+        <div class="n-title" id="n-title">🟢 Estado inicial — red funcionando correctamente.</div>
+        <div class="n-text" id="n-text">Los tres routers están activos. <b>A → B</b> cuesta 1 salto. <b>B → C</b> cuesta 1 salto. Por lo tanto, <b>A → C</b> son 2 saltos pasando por B. Todo funciona perfecto.</div>
+    </div>
+
+    <div class="workspace">
+        <div class="panel">
+            <div class="panel-header"><div class="panel-tag tag-red">1. Sin Límite (Bucle Infinito)</div></div>
+            <div class="topology-container">
+                <div class="cables-layer"><div class="cable"></div><div id="cable-bc-L" class="cable"></div></div>
+                <div class="pdu" id="pdu-L"><i class="fa-solid fa-envelope"></i></div>
+                <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo A</div></div>
+                <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo B</div></div>
+                <div class="device server" id="dest-c-L"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Dest C</div></div>
+            </div>
+            <div class="tables-grid">
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo A</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-a-L"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-L">2</span></div></div>
+                </div>
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo B</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-b-L"><span>→ C (directo)</span> <span class="cli-val" id="val-b-L">1</span></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="convergence-overlay" id="overlay-R">
+                <i class="fa-solid fa-shield-check success-icon"></i>
+                <div class="success-title">CONVERGENCIA LOGRADA</div>
+                <div class="success-text">El límite de 16 saltos en RIP ha detenido el bucle.<br>El destino se marca como inalcanzable.</div>
+            </div>
+            <div class="panel-header"><div class="panel-tag tag-green">2. Conteo Máximo (Límite 16)</div></div>
+            <div class="topology-container">
+                <div class="cables-layer"><div class="cable"></div><div id="cable-bc-R" class="cable"></div></div>
+                <div class="pdu" id="pdu-R"><i class="fa-solid fa-envelope"></i></div>
+                <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo A</div></div>
+                <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo B</div></div>
+                <div class="device server" id="dest-c-R"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Dest C</div></div>
+            </div>
+            <div class="tables-grid">
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo A</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-a-R"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-R">2</span></div></div>
+                </div>
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo B</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-b-R"><span>→ C (directo)</span> <span class="cli-val" id="val-b-R">1</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="iter-counter" id="iter-display">Iteración: 0</div>
+        <div class="buttons">
+            <button class="btn-fail" id="btn-fail" onclick="triggerFail()"><i class="fa-solid fa-bolt"></i> Simular Falla Enlace B-C</button>
+            <button class="btn-step" id="btn-step" onclick="runStep()" disabled><i class="fa-solid fa-forward-step"></i> Siguiente Iteración</button>
+            <button class="btn-auto" id="btn-auto" onclick="toggleAutoPlay()" disabled><i class="fa-solid fa-play"></i> Auto-Play</button>
+            <button class="btn-reset" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Reiniciar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let iter = 0;
+    let costAL = 2, costBL = 1;
+    let costAR = 2, costBR = 1;
+    let isAtoB = true; 
+    let converged = false;
+    let timer = null;
+
+    function updateNarrator(title, text, colorClass) {
+        const box = document.getElementById('narrator');
+        box.className = "narrator-box " + colorClass;
+        document.getElementById('n-title').innerHTML = title;
+        document.getElementById('n-text').innerHTML = text;
+    }
+
+    function triggerFail() {
+        document.getElementById('cable-bc-L').classList.add('broken');
+        document.getElementById('cable-bc-R').classList.add('broken');
+        document.getElementById('dest-c-L').classList.add('error');
+        document.getElementById('dest-c-R').classList.add('error');
+
+        costBL = "∞"; costBR = 16;
+        document.getElementById('val-b-L').innerHTML = `<span class="val-red">∞</span>`;
+        document.getElementById('val-b-R').innerHTML = `<span class="val-red">16</span>`;
+        
+        updateNarrator(
+            "💥 ¡Falla el enlace B — C!", 
+            "Un cable cortado o fallo de hardware. B detecta que <b>no puede alcanzar C directamente</b>. El costo directo pasa a ∞. La red debe recalcular rutas.", 
+            "border-red"
+        );
+        
+        document.getElementById('btn-fail').style.display = "none";
+        document.getElementById('btn-step').disabled = false;
+        document.getElementById('btn-auto').disabled = false;
+    }
+
+    function flashRow(id) {
+        const row = document.getElementById(id);
+        row.classList.add('highlight');
+        setTimeout(() => row.classList.remove('highlight'), 500);
+    }
+
+    function runStep() {
+        iter++;
+        document.getElementById('iter-display').innerText = "Iteración: " + iter;
+        
+        const pL = document.getElementById('pdu-L');
+        const pR = document.getElementById('pdu-R');
+        pL.style.animation = "none"; pR.style.animation = "none";
+        void pL.offsetWidth; 
+
+        if (isAtoB) {
+            pL.style.animation = "sendRight 0.6s ease-in-out forwards";
+            if(!converged) pR.style.animation = "sendRight 0.6s ease-in-out forwards";
+            
+            setTimeout(() => {
+                costBL = costAL + 1;
+                document.getElementById('val-b-L').innerHTML = `<span class="val-red">${costBL}</span>`;
+                flashRow('row-b-L');
+                
+                if(!converged) {
+                    costBR = costAR + 1;
+                    if(costBR >= 16) costBR = 16;
+                    document.getElementById('val-b-R').innerHTML = costBR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costBR}</span>`;
+                    flashRow('row-b-R');
+                }
+                
+                if(iter === 1) {
+                    updateNarrator(
+                        "🔍 B busca una ruta alternativa hacia C.", 
+                        `B revisa a sus vecinos. Encuentra que A dice tener ruta a C en ${costAL} saltos. B piensa: <i>"Puedo llegar a C pasando por A: 1 salto (B→A) + ${costAL} saltos (A→C) = <b>${costBL} saltos</b>"</i>. <b>Error fatal:</b> ignora que la ruta de A YA pasa por B.`, 
+                        "border-yellow"
+                    );
+                } else if (iter === 3) {
+                    updateNarrator(
+                        "📢 A anuncia su actualización a B — Segunda ronda.", 
+                        `A le dice a B: <i>"Yo llego a C en ${costAL} saltos"</i>. B recalcula: <i>"${costAL} + 1 = <b>${costBL} saltos</b>"</i>. Cada anuncio infla el contador en +2. Ninguno detecta el ciclo.`, 
+                        "border-yellow"
+                    );
+                } else if(!converged) {
+                    updateNarrator(
+                        "🔄 ¡El bucle al infinito está en plena marcha!", 
+                        "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube. El enlace B-C sigue roto, pero A y B creen tener rutas válidas que no existen.", 
+                        "border-red"
+                    );
+                }
+
+                checkConvergence();
+            }, 600);
+        } else {
+            pL.style.animation = "sendLeft 0.6s ease-in-out forwards";
+            if(!converged) pR.style.animation = "sendLeft 0.6s ease-in-out forwards";
+
+            setTimeout(() => {
+                costAL = costBL + 1;
+                document.getElementById('val-a-L').innerHTML = `<span class="val-red">${costAL}</span>`;
+                flashRow('row-a-L');
+
+                if(!converged) {
+                    costAR = costBR + 1;
+                    if(costAR >= 16) costAR = 16;
+                    document.getElementById('val-a-R').innerHTML = costAR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costAR}</span>`;
+                    flashRow('row-a-R');
+                }
+
+                if(iter === 2) {
+                    updateNarrator(
+                        "📢 B anuncia su nueva ruta a A.", 
+                        `B le dice a A: <i>"Yo llego a C en ${costBL} saltos"</i>. A recibe esta actualización y recalcula. A piensa: <i>"B llega a C en ${costBL}, más 1 salto mío = <b>${costAL} saltos</b>"</i>. El ciclo vicioso ha comenzado.`, 
+                        "border-yellow"
+                    );
+                } else if(!converged) {
+                    updateNarrator(
+                        "🔄 ¡El bucle al infinito está en plena marcha!", 
+                        "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube. El enlace B-C sigue roto, pero A y B creen tener rutas válidas que no existen.", 
+                        "border-red"
+                    );
+                }
+
+                checkConvergence();
+            }, 600);
+        }
+        isAtoB = !isAtoB;
+    }
+
+    function checkConvergence() {
+        if(!converged && costAR >= 16 && costBR >= 16) {
+            converged = true;
+            document.getElementById('overlay-R').classList.add('active');
+            
+            updateNarrator(
+                "🛡️ ¡El Conteo Máximo detiene el bucle!", 
+                "En la red derecha, el protocolo RIP aplica su límite de 16 saltos. El destino C se declara inalcanzable y el bucle se detiene forzosamente. La red izquierda seguirá colapsando indefinidamente.", 
+                "border-green"
+            );
+            
+            if(timer) {
+                clearInterval(timer);
+                const btn = document.getElementById('btn-auto');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Finalizado';
+                btn.disabled = true;
+                document.getElementById('btn-step').disabled = true;
+            }
+        }
+    }
+
+    function toggleAutoPlay() {
+        const btn = document.getElementById('btn-auto');
+        if(timer) {
+            clearInterval(timer); timer = null;
+            btn.innerHTML = '<i class="fa-solid fa-play"></i> Auto-Play';
+            document.getElementById('btn-step').disabled = false;
+        } else {
+            runStep();
+            timer = setInterval(runStep, 2500);
+            btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+            document.getElementById('btn-step').disabled = true;
+        }
+    }
+</script>
+
+</body>
+</html>
