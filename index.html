@@ -92,13 +92,22 @@
         .val-red { color: #ff7b72; font-weight: 800;}
         .highlight { background: rgba(56, 139, 253, 0.15); border: 1px solid #1f6feb; }
 
+        /* Overlays de Remate Final */
         .convergence-overlay {
-            position: absolute; inset: 0; background: rgba(13, 17, 23, 0.9); backdrop-filter: blur(4px); border-radius: 10px; z-index: 10;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; border: 1px solid #2ea043;
+            position: absolute; inset: 0; backdrop-filter: blur(4px); border-radius: 10px; z-index: 10;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            opacity: 0; pointer-events: none; transition: opacity 0.8s ease-in-out;
         }
         .convergence-overlay.active { opacity: 1; pointer-events: auto; }
-        .success-icon { font-size: 40px; color: #3fb950; margin-bottom: 15px; }
-        .success-title { color: #e6edf3; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+        
+        .overlay-green { background: rgba(13, 17, 23, 0.9); border: 1px solid #2ea043; }
+        .overlay-green .success-icon { font-size: 40px; color: #3fb950; margin-bottom: 15px; }
+        .overlay-green .success-title { color: #e6edf3; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+        
+        .overlay-red { background: rgba(26, 11, 13, 0.95); border: 1px solid #da3633; }
+        .overlay-red .success-icon { font-size: 45px; color: #f85149; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(248,81,73,0.5)); }
+        .overlay-red .success-title { color: #f85149; font-size: 24px; font-weight: 900; margin-bottom: 5px; letter-spacing: 1px;}
+        
         .success-text { color: #8b949e; font-size: 14px; text-align: center; }
 
         .bottom-bar { background: #161b22; border-top: 1px solid #30363d; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -126,7 +135,15 @@
     </div>
 
     <div class="workspace">
+        <!-- PANEL IZQUIERDO -->
         <div class="panel">
+            <!-- NUEVO REMATE: OVERLAY ROJO -->
+            <div class="convergence-overlay overlay-red" id="overlay-L">
+                <i class="fa-solid fa-infinity success-icon"></i>
+                <div class="success-title">HACIA EL INFINITO...</div>
+                <div class="success-text" style="color: #ff7b72;">Al carecer de un límite, esta red ha colapsado.<br>Seguirá consumiendo ancho de banda para siempre.</div>
+            </div>
+
             <div class="panel-header"><div class="panel-tag tag-red">1. Sin Límite (Bucle Infinito)</div></div>
             <div class="topology-container">
                 <div class="cables-layer"><div class="cable"></div><div id="cable-bc-L" class="cable"></div></div>
@@ -147,8 +164,10 @@
             </div>
         </div>
 
+        <!-- PANEL DERECHO -->
         <div class="panel">
-            <div class="convergence-overlay" id="overlay-R">
+            <!-- OVERLAY VERDE -->
+            <div class="convergence-overlay overlay-green" id="overlay-R">
                 <i class="fa-solid fa-shield-check success-icon"></i>
                 <div class="success-title">CONVERGENCIA LOGRADA</div>
                 <div class="success-text">El límite de 16 saltos en RIP ha detenido el bucle.<br>El destino se marca como inalcanzable.</div>
@@ -237,7 +256,7 @@
         void pL.offsetWidth; 
 
         if (isAtoB) {
-            pL.style.animation = "sendRight 0.6s ease-in-out forwards";
+            if(!converged) pL.style.animation = "sendRight 0.6s ease-in-out forwards";
             if(!converged) pR.style.animation = "sendRight 0.6s ease-in-out forwards";
             
             setTimeout(() => {
@@ -275,7 +294,7 @@
                 checkConvergence();
             }, 600);
         } else {
-            pL.style.animation = "sendLeft 0.6s ease-in-out forwards";
+            if(!converged) pL.style.animation = "sendLeft 0.6s ease-in-out forwards";
             if(!converged) pR.style.animation = "sendLeft 0.6s ease-in-out forwards";
 
             setTimeout(() => {
@@ -312,12 +331,14 @@
 
     function checkConvergence() {
         if(!converged && costAR >= 16 && costBR >= 16) {
-            converged = true;
+            converged = true; // Detiene el flujo de la animación
+            
+            // 1. Mostrar éxito en el lado derecho inmediatamente
             document.getElementById('overlay-R').classList.add('active');
             
             updateNarrator(
                 "🛡️ ¡El Conteo Máximo detiene el bucle!", 
-                "En la red derecha, el protocolo RIP aplica su límite de 16 saltos. El destino C se declara inalcanzable y el bucle se detiene forzosamente. La red izquierda seguirá colapsando indefinidamente.", 
+                "El panel derecho aplica el límite de 16 saltos y detiene el error. <b style='color:#ff7b72;'>Mientras tanto, la red izquierda ha colapsado hacia el infinito...</b>", 
                 "border-green"
             );
             
@@ -328,6 +349,11 @@
                 btn.disabled = true;
                 document.getElementById('btn-step').disabled = true;
             }
+
+            // 2. Mostrar el remate dramático en el lado izquierdo después de 1.2 segundos
+            setTimeout(() => {
+                document.getElementById('overlay-L').classList.add('active');
+            }, 1200);
         }
     }
 
