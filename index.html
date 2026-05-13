@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Simulador de Redes - Conteo Máximo">
-    <meta property="og:description" content="Animación interactiva del bucle al infinito y su solución.">
-    <meta property="og:type" content="website">
-    
     <title>Simulador de Redes - Grupo 1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -29,12 +25,13 @@
         .narrator-box {
             background: #0d1117; border-bottom: 1px solid #30363d; padding: 15px 30px;
             display: flex; flex-direction: column; justify-content: center; min-height: 110px;
-            transition: border-left 0.3s; border-left: 6px solid #3b82f6;
+            transition: all 0.3s ease; border-left: 6px solid #8b949e;
         }
-        .narrator-box.border-blue { border-left-color: #3b82f6; }
-        .narrator-box.border-red { border-left-color: #f85149; background: rgba(248,81,73,0.05); }
-        .narrator-box.border-yellow { border-left-color: #d29922; background: rgba(210,153,34,0.05); }
-        .narrator-box.border-green { border-left-color: #2ea043; background: rgba(46,160,67,0.05); }
+        .border-gray { border-left-color: #8b949e; }
+        .border-blue { border-left-color: #3b82f6; background: rgba(59,130,246,0.05); }
+        .border-red { border-left-color: #f85149; background: rgba(248,81,73,0.05); }
+        .border-yellow { border-left-color: #d29922; background: rgba(210,153,34,0.05); }
+        .border-green { border-left-color: #2ea043; background: rgba(46,160,67,0.05); }
         
         .n-title { color: #e6edf3; font-size: 16px; font-weight: 800; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         .n-text { color: #8b949e; font-size: 14px; line-height: 1.4; }
@@ -64,7 +61,13 @@
             position: absolute; top: 50%; left: 40px; right: 40px; transform: translateY(-50%); display: flex; z-index: 1;
         }
         .cable { flex: 1; height: 4px; background: #3b82f6; transition: 0.3s; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-        .cable.broken { background: transparent; border-top: 3px dashed #f85149; box-shadow: none; }
+        .cable.broken { background: transparent !important; border-top: 3px dashed #f85149; box-shadow: none !important; animation: none !important; }
+
+        @keyframes pulseLink {
+            0% { box-shadow: 0 0 5px #3b82f6; background: #3b82f6; }
+            50% { box-shadow: 0 0 15px #7ee787; background: #7ee787; }
+            100% { box-shadow: 0 0 5px #3b82f6; background: #3b82f6; }
+        }
 
         .device { display: flex; flex-direction: column; align-items: center; z-index: 2; background: #21262d; padding: 0 10px; }
         .icon-wrapper {
@@ -78,18 +81,20 @@
         
         .device-name { font-weight: 800; font-size: 13px; color: #e6edf3; }
 
-        .pdu { position: absolute; top: 50%; left: 0; transform: translateY(-50%); font-size: 20px; color: #d2a8ff; z-index: 5; opacity: 0; filter: drop-shadow(0 0 5px rgba(210, 168, 255, 0.6)); }
+        .pdu { position: absolute; top: 50%; left: 0; transform: translateY(-50%); font-size: 20px; color: #d2a8ff; z-index: 5; opacity: 0; filter: drop-shadow(0 0 5px rgba(210, 168, 255, 0.6)); pointer-events: none;}
 
         @keyframes sendRight { 0% { left: 40px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(50% - 10px); opacity: 0; } }
         @keyframes sendLeft { 0% { left: calc(50% - 10px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 40px; opacity: 0; } }
 
-        .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        /* Ajuste de tablas */
+        .tables-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; }
         .cli-table { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; overflow: hidden; }
-        .cli-head { background: #161b22; padding: 6px 10px; font-size: 11px; font-weight: 800; color: #8b949e; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; }
+        .cli-head { background: #161b22; padding: 6px 10px; font-size: 11px; font-weight: 800; color: #8b949e; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; text-align: center; }
         .cli-body { padding: 10px; }
-        .cli-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; transition: background 0.3s; padding: 4px 6px; border-radius: 4px; }
-        .cli-val { font-weight: 700; }
+        .cli-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c9d1d9; transition: background 0.3s; padding: 4px 4px; border-radius: 4px; }
+        .cli-val { font-weight: 700; color: #8b949e; }
         .val-red { color: #ff7b72; font-weight: 800;}
+        .val-green { color: #3fb950; font-weight: 800; }
         .highlight { background: rgba(56, 139, 253, 0.15); border: 1px solid #1f6feb; }
 
         /* Overlays de Remate Final */
@@ -111,62 +116,67 @@
         .success-text { color: #8b949e; font-size: 14px; text-align: center; }
 
         .bottom-bar { background: #161b22; border-top: 1px solid #30363d; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .iter-counter { background: #21262d; border: 1px solid #30363d; padding: 8px 15px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #c9d1d9; font-size: 14px; }
-        .buttons { display: flex; gap: 15px; }
-        button { padding: 10px 18px; border-radius: 6px; border: 1px solid transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-        .btn-fail { background: #da3633; color: white; border-color: #f85149; }
-        .btn-fail:hover { background: #f85149; }
+        .iter-counter { background: #21262d; border: 1px solid #30363d; padding: 8px 15px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #c9d1d9; font-size: 14px; min-width: 150px; text-align: center;}
+        .buttons { display: flex; gap: 10px; }
+        button { padding: 10px 15px; border-radius: 6px; border: 1px solid transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        
         .btn-step { background: #238636; color: white; border-color: #2ea043; }
         .btn-step:hover { background: #2ea043; }
+        .btn-step:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .btn-auto { background: #1f6feb; color: white; border-color: #58a6ff; }
         .btn-auto:hover { background: #388bfd; }
+        .btn-auto:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .btn-reset { background: transparent; color: #c9d1d9; border-color: #8b949e; }
         .btn-reset:hover { background: #30363d; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; border-color: transparent; }
 
     </style>
 </head>
 <body>
 
 <div class="canva-frame">
-    <div class="narrator-box border-blue" id="narrator">
-        <div class="n-title" id="n-title">🟢 Estado inicial — red funcionando correctamente.</div>
-        <div class="n-text" id="n-text">Los tres routers están activos. <b>A → B</b> cuesta 1 salto. <b>B → C</b> cuesta 1 salto. Por lo tanto, <b>A → C</b> son 2 saltos pasando por B. Todo funciona perfecto.</div>
+    <div class="narrator-box border-gray" id="narrator">
+        <div class="n-title" id="n-title">⚪ Red recién encendida — Sin información de rutas.</div>
+        <div class="n-text" id="n-text">Los tres nodos acaban de encenderse. Sus tablas están vacías porque aún no conocen la red. Haz clic en <b>Siguiente</b> o en <b>Auto-Play</b> para iniciar la simulación paso a paso.</div>
     </div>
 
     <div class="workspace">
         <!-- PANEL IZQUIERDO -->
         <div class="panel">
-            <!-- NUEVO REMATE: OVERLAY ROJO -->
             <div class="convergence-overlay overlay-red" id="overlay-L">
                 <i class="fa-solid fa-infinity success-icon"></i>
                 <div class="success-title">HACIA EL INFINITO...</div>
-                <div class="success-text" style="color: #ff7b72;">Al carecer de un límite, esta red ha colapsado.<br>Seguirá consumiendo ancho de banda para siempre.</div>
+                <div class="success-text" style="color: #ff7b72;">Al carecer de un límite, esta red ha colapsado.<br>Los saltos seguirán aumentando hasta que se solucione el error.</div>
             </div>
 
             <div class="panel-header"><div class="panel-tag tag-red">1. Sin Límite (Bucle Infinito)</div></div>
             <div class="topology-container">
-                <div class="cables-layer"><div class="cable"></div><div id="cable-bc-L" class="cable"></div></div>
+                <div class="cables-layer"><div class="cable cable-ab"></div><div id="cable-bc-L" class="cable cable-bc"></div></div>
                 <div class="pdu" id="pdu-L"><i class="fa-solid fa-envelope"></i></div>
                 <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo A</div></div>
                 <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo B</div></div>
-                <div class="device server" id="dest-c-L"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Dest C</div></div>
+                <div class="device server" id="dest-c-L"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Nodo C</div></div>
             </div>
+            
             <div class="tables-grid">
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo A</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-a-L"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-L">2</span></div></div>
+                    <div class="cli-body"><div class="cli-row" id="row-a-L"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-L">-</span></div></div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo B</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-b-L"><span>→ C (directo)</span> <span class="cli-val" id="val-b-L">1</span></div></div>
+                    <div class="cli-body"><div class="cli-row" id="row-b-L"><span>→ C (directo)</span> <span class="cli-val" id="val-b-L">-</span></div></div>
+                </div>
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo C</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-c-L"><span>→ B (directo)</span> <span class="cli-val" id="val-c-L">-</span></div></div>
                 </div>
             </div>
         </div>
 
         <!-- PANEL DERECHO -->
         <div class="panel">
-            <!-- OVERLAY VERDE -->
             <div class="convergence-overlay overlay-green" id="overlay-R">
                 <i class="fa-solid fa-shield-check success-icon"></i>
                 <div class="success-title">CONVERGENCIA LOGRADA</div>
@@ -174,43 +184,50 @@
             </div>
             <div class="panel-header"><div class="panel-tag tag-green">2. Conteo Máximo (Límite 16)</div></div>
             <div class="topology-container">
-                <div class="cables-layer"><div class="cable"></div><div id="cable-bc-R" class="cable"></div></div>
+                <div class="cables-layer"><div class="cable cable-ab"></div><div id="cable-bc-R" class="cable cable-bc"></div></div>
                 <div class="pdu" id="pdu-R"><i class="fa-solid fa-envelope"></i></div>
                 <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo A</div></div>
                 <div class="device router"><div class="icon-wrapper"><i class="fa-solid fa-network-wired"></i></div><div class="device-name">Nodo B</div></div>
-                <div class="device server" id="dest-c-R"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Dest C</div></div>
+                <div class="device server" id="dest-c-R"><div class="icon-wrapper"><i class="fa-solid fa-server"></i></div><div class="device-name">Nodo C</div></div>
             </div>
+            
             <div class="tables-grid">
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo A</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-a-R"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-R">2</span></div></div>
+                    <div class="cli-body"><div class="cli-row" id="row-a-R"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-R">-</span></div></div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo B</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-b-R"><span>→ C (directo)</span> <span class="cli-val" id="val-b-R">1</span></div></div>
+                    <div class="cli-body"><div class="cli-row" id="row-b-R"><span>→ C (directo)</span> <span class="cli-val" id="val-b-R">-</span></div></div>
+                </div>
+                <div class="cli-table">
+                    <div class="cli-head"><span>Tabla Nodo C</span></div>
+                    <div class="cli-body"><div class="cli-row" id="row-c-R"><span>→ B (directo)</span> <span class="cli-val" id="val-c-R">-</span></div></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="bottom-bar">
-        <div class="iter-counter" id="iter-display">Iteración: 0</div>
+        <div class="iter-counter" id="iter-display">Fase: Preparación</div>
         <div class="buttons">
-            <button class="btn-fail" id="btn-fail" onclick="triggerFail()"><i class="fa-solid fa-bolt"></i> Simular Falla Enlace B-C</button>
-            <button class="btn-step" id="btn-step" onclick="runStep()" disabled><i class="fa-solid fa-forward-step"></i> Siguiente Iteración</button>
-            <button class="btn-auto" id="btn-auto" onclick="toggleAutoPlay()" disabled><i class="fa-solid fa-play"></i> Auto-Play</button>
+            <button class="btn-step" id="btn-step" onclick="runStep()"><i class="fa-solid fa-forward-step"></i> Siguiente</button>
+            <button class="btn-auto" id="btn-auto" onclick="toggleAutoPlay()"><i class="fa-solid fa-play"></i> Auto-Play</button>
             <button class="btn-reset" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Reiniciar</button>
         </div>
     </div>
 </div>
 
 <script>
-    let iter = 0;
+    // Variables de estado puro (Motor Original Secuencial)
+    let step = 0;
+    let iter = 0; // Iteraciones matemáticas del algoritmo RIP
     let costAL = 2, costBL = 1;
     let costAR = 2, costBR = 1;
     let isAtoB = true; 
     let converged = false;
     let timer = null;
+    let isAnimating = false;
 
     function updateNarrator(title, text, colorClass) {
         const box = document.getElementById('narrator');
@@ -219,121 +236,16 @@
         document.getElementById('n-text').innerHTML = text;
     }
 
-    function triggerFail() {
-        document.getElementById('cable-bc-L').classList.add('broken');
-        document.getElementById('cable-bc-R').classList.add('broken');
-        document.getElementById('dest-c-L').classList.add('error');
-        document.getElementById('dest-c-R').classList.add('error');
-
-        costBL = "∞"; costBR = 16;
-        document.getElementById('val-b-L').innerHTML = `<span class="val-red">∞</span>`;
-        document.getElementById('val-b-R').innerHTML = `<span class="val-red">16</span>`;
-        
-        updateNarrator(
-            "💥 ¡Falla el enlace B — C!", 
-            "Un cable cortado o fallo de hardware. B detecta que <b>no puede alcanzar C directamente</b>. El costo directo pasa a ∞. La red debe recalcular rutas.", 
-            "border-red"
-        );
-        
-        document.getElementById('btn-fail').style.display = "none";
-        document.getElementById('btn-step').disabled = false;
-        document.getElementById('btn-auto').disabled = false;
-    }
-
     function flashRow(id) {
         const row = document.getElementById(id);
         row.classList.add('highlight');
         setTimeout(() => row.classList.remove('highlight'), 500);
     }
 
-    function runStep() {
-        iter++;
-        document.getElementById('iter-display').innerText = "Iteración: " + iter;
-        
-        const pL = document.getElementById('pdu-L');
-        const pR = document.getElementById('pdu-R');
-        pL.style.animation = "none"; pR.style.animation = "none";
-        void pL.offsetWidth; 
-
-        if (isAtoB) {
-            if(!converged) pL.style.animation = "sendRight 0.6s ease-in-out forwards";
-            if(!converged) pR.style.animation = "sendRight 0.6s ease-in-out forwards";
-            
-            setTimeout(() => {
-                costBL = costAL + 1;
-                document.getElementById('val-b-L').innerHTML = `<span class="val-red">${costBL}</span>`;
-                flashRow('row-b-L');
-                
-                if(!converged) {
-                    costBR = costAR + 1;
-                    if(costBR >= 16) costBR = 16;
-                    document.getElementById('val-b-R').innerHTML = costBR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costBR}</span>`;
-                    flashRow('row-b-R');
-                }
-                
-                if(iter === 1) {
-                    updateNarrator(
-                        "🔍 B busca una ruta alternativa hacia C.", 
-                        `B revisa a sus vecinos. Encuentra que A dice tener ruta a C en ${costAL} saltos. B piensa: <i>"Puedo llegar a C pasando por A: 1 salto (B→A) + ${costAL} saltos (A→C) = <b>${costBL} saltos</b>"</i>. <b>Error fatal:</b> ignora que la ruta de A YA pasa por B.`, 
-                        "border-yellow"
-                    );
-                } else if (iter === 3) {
-                    updateNarrator(
-                        "📢 A anuncia su actualización a B — Segunda ronda.", 
-                        `A le dice a B: <i>"Yo llego a C en ${costAL} saltos"</i>. B recalcula: <i>"${costAL} + 1 = <b>${costBL} saltos</b>"</i>. Cada anuncio infla el contador en +2. Ninguno detecta el ciclo.`, 
-                        "border-yellow"
-                    );
-                } else if(!converged) {
-                    updateNarrator(
-                        "🔄 ¡El bucle al infinito está en plena marcha!", 
-                        "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube. El enlace B-C sigue roto, pero A y B creen tener rutas válidas que no existen.", 
-                        "border-red"
-                    );
-                }
-
-                checkConvergence();
-            }, 600);
-        } else {
-            if(!converged) pL.style.animation = "sendLeft 0.6s ease-in-out forwards";
-            if(!converged) pR.style.animation = "sendLeft 0.6s ease-in-out forwards";
-
-            setTimeout(() => {
-                costAL = costBL + 1;
-                document.getElementById('val-a-L').innerHTML = `<span class="val-red">${costAL}</span>`;
-                flashRow('row-a-L');
-
-                if(!converged) {
-                    costAR = costBR + 1;
-                    if(costAR >= 16) costAR = 16;
-                    document.getElementById('val-a-R').innerHTML = costAR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costAR}</span>`;
-                    flashRow('row-a-R');
-                }
-
-                if(iter === 2) {
-                    updateNarrator(
-                        "📢 B anuncia su nueva ruta a A.", 
-                        `B le dice a A: <i>"Yo llego a C en ${costBL} saltos"</i>. A recibe esta actualización y recalcula. A piensa: <i>"B llega a C en ${costBL}, más 1 salto mío = <b>${costAL} saltos</b>"</i>. El ciclo vicioso ha comenzado.`, 
-                        "border-yellow"
-                    );
-                } else if(!converged) {
-                    updateNarrator(
-                        "🔄 ¡El bucle al infinito está en plena marcha!", 
-                        "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube. El enlace B-C sigue roto, pero A y B creen tener rutas válidas que no existen.", 
-                        "border-red"
-                    );
-                }
-
-                checkConvergence();
-            }, 600);
-        }
-        isAtoB = !isAtoB;
-    }
-
     function checkConvergence() {
         if(!converged && costAR >= 16 && costBR >= 16) {
-            converged = true; // Detiene el flujo de la animación
+            converged = true; 
             
-            // 1. Mostrar éxito en el lado derecho inmediatamente
             document.getElementById('overlay-R').classList.add('active');
             
             updateNarrator(
@@ -350,24 +262,158 @@
                 document.getElementById('btn-step').disabled = true;
             }
 
-            // 2. Mostrar el remate dramático en el lado izquierdo después de 1.2 segundos
             setTimeout(() => {
                 document.getElementById('overlay-L').classList.add('active');
             }, 1200);
         }
     }
 
+    function runStep() {
+        if(isAnimating || converged) return;
+        isAnimating = true;
+        step++;
+
+        if (step === 1) {
+            // FASE 1: INICIO DE RED (Cables brillan, se llenan tablas)
+            document.getElementById('iter-display').innerText = "Fase: Intercambio Inicial";
+            
+            updateNarrator(
+                "🔄 Intercambiando tablas de enrutamiento...", 
+                "Los tres nodos están sin fallas. Se están informando entre sí a cuántos saltos se encuentran para construir sus rutas iniciales.", 
+                "border-blue"
+            );
+
+            const cables = document.querySelectorAll('.cable');
+            cables.forEach(c => c.style.animation = "pulseLink 0.5s 2");
+
+            setTimeout(() => {
+                cables.forEach(c => c.style.animation = "none");
+
+                // Llenar tablas
+                ['val-a-L', 'val-a-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">2</span>'; flashRow(id.replace('val', 'row')); });
+                ['val-b-L', 'val-b-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+                ['val-c-L', 'val-c-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+
+                updateNarrator(
+                    "🟢 Estado inicial configurado — Red sin fallas.", 
+                    "Los nodos ya se informaron. <b>A → C</b> está a 2 saltos. <b>B → C</b> está a 1 salto. La red funciona perfectamente.", 
+                    "border-green"
+                );
+                isAnimating = false;
+            }, 1000);
+
+        } else if (step === 2) {
+            // FASE 2: FALLA ESPONTÁNEA
+            document.getElementById('iter-display').innerText = "Fase: Falla Físca";
+            
+            document.getElementById('cable-bc-L').classList.add('broken');
+            document.getElementById('cable-bc-R').classList.add('broken');
+            document.getElementById('dest-c-L').classList.add('error');
+            document.getElementById('dest-c-R').classList.add('error');
+
+            costBL = "∞"; costBR = 16;
+            
+            // Actualizar B
+            document.getElementById('val-b-L').innerHTML = `<span class="val-red">∞</span>`;
+            document.getElementById('val-b-R').innerHTML = `<span class="val-red">16</span>`;
+            flashRow('row-b-L'); flashRow('row-b-R');
+            
+            // Actualizar C
+            document.getElementById('val-c-L').innerHTML = `<span class="val-red">∞</span>`;
+            document.getElementById('val-c-R').innerHTML = `<span class="val-red">16</span>`;
+            flashRow('row-c-L'); flashRow('row-c-R');
+
+            updateNarrator(
+                "💥 ¡Se generó un error de comunicación!", 
+                "El cable físico entre B y C se ha reventado de repente. B y C detectan que perdieron conexión directa y marcan sus rutas como infinito (o 16). <b>¡Comienza el bucle!</b>", 
+                "border-red"
+            );
+            
+            setTimeout(() => { isAnimating = false; }, 500);
+
+        } else {
+            // FASE 3: BUCLE INFINITO ALGORÍTMICO (Con Sobres Animados)
+            iter++;
+            document.getElementById('iter-display').innerText = "Iteración RIP: " + iter;
+            
+            const pL = document.getElementById('pdu-L');
+            const pR = document.getElementById('pdu-R');
+            pL.style.animation = "none"; pR.style.animation = "none";
+            void pL.offsetWidth; 
+
+            if (isAtoB) {
+                // A -> B
+                if(!converged) pL.style.animation = "sendRight 0.6s ease-in-out forwards";
+                if(!converged) pR.style.animation = "sendRight 0.6s ease-in-out forwards";
+                
+                setTimeout(() => {
+                    costBL = costAL + 1;
+                    document.getElementById('val-b-L').innerHTML = `<span class="val-red">${costBL}</span>`;
+                    flashRow('row-b-L');
+                    
+                    if(!converged) {
+                        costBR = costAR + 1;
+                        if(costBR >= 16) costBR = 16;
+                        document.getElementById('val-b-R').innerHTML = costBR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costBR}</span>`;
+                        flashRow('row-b-R');
+                    }
+                    
+                    if(iter === 1) {
+                        updateNarrator("🔍 B busca una ruta alternativa hacia C.", `B revisa a sus vecinos. Encuentra que A dice tener ruta a C en ${costAL} saltos. B piensa: <i>"Puedo llegar a C pasando por A: 1 salto (B→A) + ${costAL} saltos (A→C) = <b>${costBL} saltos</b>"</i>. <b>Error fatal:</b> ignora que la ruta de A YA pasa por B.`, "border-yellow");
+                    } else if (iter === 3) {
+                        updateNarrator("📢 A anuncia su actualización a B — Segunda ronda.", `A le dice a B: <i>"Yo llego a C en ${costAL} saltos"</i>. B recalcula: <i>"${costAL} + 1 = <b>${costBL} saltos</b>"</i>. Cada anuncio infla el contador en +2. Ninguno detecta el ciclo.`, "border-yellow");
+                    } else if(!converged) {
+                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube consumiendo ancho de banda.", "border-red");
+                    }
+
+                    checkConvergence();
+                    isAnimating = false;
+                }, 600);
+            } else {
+                // B -> A
+                if(!converged) pL.style.animation = "sendLeft 0.6s ease-in-out forwards";
+                if(!converged) pR.style.animation = "sendLeft 0.6s ease-in-out forwards";
+
+                setTimeout(() => {
+                    costAL = costBL + 1;
+                    document.getElementById('val-a-L').innerHTML = `<span class="val-red">${costAL}</span>`;
+                    flashRow('row-a-L');
+
+                    if(!converged) {
+                        costAR = costBR + 1;
+                        if(costAR >= 16) costAR = 16;
+                        document.getElementById('val-a-R').innerHTML = costAR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costAR}</span>`;
+                        flashRow('row-a-R');
+                    }
+
+                    if(iter === 2) {
+                        updateNarrator("📢 B anuncia su nueva ruta a A.", `B le dice a A: <i>"Yo llego a C en ${costBL} saltos"</i>. A recibe esta actualización y recalcula. A piensa: <i>"B llega a C en ${costBL}, más 1 salto mío = <b>${costAL} saltos</b>"</i>. El ciclo vicioso ha comenzado.`, "border-yellow");
+                    } else if(!converged) {
+                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube consumiendo ancho de banda.", "border-red");
+                    }
+
+                    checkConvergence();
+                    isAnimating = false;
+                }, 600);
+            }
+            isAtoB = !isAtoB;
+        }
+    }
+
     function toggleAutoPlay() {
         const btn = document.getElementById('btn-auto');
-        if(timer) {
+        if (timer) {
             clearInterval(timer); timer = null;
             btn.innerHTML = '<i class="fa-solid fa-play"></i> Auto-Play';
             document.getElementById('btn-step').disabled = false;
         } else {
-            runStep();
-            timer = setInterval(runStep, 2500);
-            btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
             document.getElementById('btn-step').disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+            runStep();
+            // Ejecutar el resto de forma automática (con un intervalo seguro para la animación)
+            timer = setInterval(() => {
+                if(!converged) runStep();
+            }, 2500);
         }
     }
 </script>
