@@ -44,7 +44,7 @@
             display: flex; flex-direction: column; position: relative; padding: 15px 20px;
         }
         
-        .panel-header { text-align: center; margin-bottom: 25px; }
+        .panel-header { text-align: center; margin-bottom: 20px; }
         .panel-tag {
             display: inline-block; padding: 6px 15px; border-radius: 6px; font-size: 13px;
             font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
@@ -54,7 +54,7 @@
 
         .topology-container {
             position: relative; width: 100%; height: 90px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; margin-bottom: 30px;
+            padding: 0 40px; margin-bottom: 20px;
         }
         
         .cables-layer {
@@ -86,12 +86,13 @@
         @keyframes sendRight { 0% { left: 40px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(50% - 10px); opacity: 0; } }
         @keyframes sendLeft { 0% { left: calc(50% - 10px); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 40px; opacity: 0; } }
 
-        /* Ajuste de tablas */
+        /* Ajuste de tablas para soportar múltiples filas */
         .tables-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; }
         .cli-table { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; overflow: hidden; }
         .cli-head { background: #161b22; padding: 6px 10px; font-size: 11px; font-weight: 800; color: #8b949e; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; text-align: center; }
-        .cli-body { padding: 10px; }
-        .cli-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c9d1d9; transition: background 0.3s; padding: 4px 4px; border-radius: 4px; }
+        .cli-body { padding: 6px; }
+        .cli-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c9d1d9; transition: background 0.3s; padding: 4px 6px; border-radius: 4px; margin-bottom: 2px;}
+        .cli-row:last-child { margin-bottom: 0; }
         .cli-val { font-weight: 700; color: #8b949e; }
         .val-red { color: #ff7b72; font-weight: 800;}
         .val-green { color: #3fb950; font-weight: 800; }
@@ -162,15 +163,24 @@
             <div class="tables-grid">
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo A</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-a-L"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-L">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-a-to-b-L"><span>→ B (directo)</span> <span class="cli-val" id="val-a-to-b-L">-</span></div>
+                        <div class="cli-row" id="row-a-to-c-L"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-to-c-L">-</span></div>
+                    </div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo B</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-b-L"><span>→ C (directo)</span> <span class="cli-val" id="val-b-L">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-b-to-a-L"><span>→ A (directo)</span> <span class="cli-val" id="val-b-to-a-L">-</span></div>
+                        <div class="cli-row" id="row-b-to-c-L"><span>→ C (directo)</span> <span class="cli-val" id="val-b-to-c-L">-</span></div>
+                    </div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo C</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-c-L"><span>→ B (directo)</span> <span class="cli-val" id="val-c-L">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-c-to-a-L"><span>→ A (vía B)</span> <span class="cli-val" id="val-c-to-a-L">-</span></div>
+                        <div class="cli-row" id="row-c-to-b-L"><span>→ B (directo)</span> <span class="cli-val" id="val-c-to-b-L">-</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -194,15 +204,24 @@
             <div class="tables-grid">
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo A</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-a-R"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-R">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-a-to-b-R"><span>→ B (directo)</span> <span class="cli-val" id="val-a-to-b-R">-</span></div>
+                        <div class="cli-row" id="row-a-to-c-R"><span>→ C (vía B)</span> <span class="cli-val" id="val-a-to-c-R">-</span></div>
+                    </div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo B</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-b-R"><span>→ C (directo)</span> <span class="cli-val" id="val-b-R">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-b-to-a-R"><span>→ A (directo)</span> <span class="cli-val" id="val-b-to-a-R">-</span></div>
+                        <div class="cli-row" id="row-b-to-c-R"><span>→ C (directo)</span> <span class="cli-val" id="val-b-to-c-R">-</span></div>
+                    </div>
                 </div>
                 <div class="cli-table">
                     <div class="cli-head"><span>Tabla Nodo C</span></div>
-                    <div class="cli-body"><div class="cli-row" id="row-c-R"><span>→ B (directo)</span> <span class="cli-val" id="val-c-R">-</span></div></div>
+                    <div class="cli-body">
+                        <div class="cli-row" id="row-c-to-a-R"><span>→ A (vía B)</span> <span class="cli-val" id="val-c-to-a-R">-</span></div>
+                        <div class="cli-row" id="row-c-to-b-R"><span>→ B (directo)</span> <span class="cli-val" id="val-c-to-b-R">-</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -221,7 +240,7 @@
 <script>
     // Variables de estado puro (Motor Original Secuencial)
     let step = 0;
-    let iter = 0; // Iteraciones matemáticas del algoritmo RIP
+    let iter = 0; // Iteraciones matemáticas del algoritmo RIP hacia el Nodo C
     let costAL = 2, costBL = 1;
     let costAR = 2, costBR = 1;
     let isAtoB = true; 
@@ -238,8 +257,10 @@
 
     function flashRow(id) {
         const row = document.getElementById(id);
-        row.classList.add('highlight');
-        setTimeout(() => row.classList.remove('highlight'), 500);
+        if(row) {
+            row.classList.add('highlight');
+            setTimeout(() => row.classList.remove('highlight'), 500);
+        }
     }
 
     function checkConvergence() {
@@ -274,12 +295,12 @@
         step++;
 
         if (step === 1) {
-            // FASE 1: INICIO DE RED (Cables brillan, se llenan tablas)
+            // FASE 1: INICIO DE RED (Cables brillan, se llenan tablas COMPLETAS)
             document.getElementById('iter-display').innerText = "Fase: Intercambio Inicial";
             
             updateNarrator(
                 "🔄 Intercambiando tablas de enrutamiento...", 
-                "Los tres nodos están sin fallas. Se están informando entre sí a cuántos saltos se encuentran para construir sus rutas iniciales.", 
+                "Los nodos construyen sus tablas completas informándose de TODAS las rutas disponibles hacia el resto de la red.", 
                 "border-blue"
             );
 
@@ -289,14 +310,21 @@
             setTimeout(() => {
                 cables.forEach(c => c.style.animation = "none");
 
-                // Llenar tablas
-                ['val-a-L', 'val-a-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">2</span>'; flashRow(id.replace('val', 'row')); });
-                ['val-b-L', 'val-b-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
-                ['val-c-L', 'val-c-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+                // Llenar rutas de A
+                ['val-a-to-b-L', 'val-a-to-b-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+                ['val-a-to-c-L', 'val-a-to-c-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">2</span>'; flashRow(id.replace('val', 'row')); });
+                
+                // Llenar rutas de B
+                ['val-b-to-a-L', 'val-b-to-a-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+                ['val-b-to-c-L', 'val-b-to-c-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
+
+                // Llenar rutas de C
+                ['val-c-to-a-L', 'val-c-to-a-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">2</span>'; flashRow(id.replace('val', 'row')); });
+                ['val-c-to-b-L', 'val-c-to-b-R'].forEach(id => { document.getElementById(id).innerHTML = '<span class="val-green">1</span>'; flashRow(id.replace('val', 'row')); });
 
                 updateNarrator(
                     "🟢 Estado inicial configurado — Red sin fallas.", 
-                    "Los nodos ya se informaron. <b>A → C</b> está a 2 saltos. <b>B → C</b> está a 1 salto. La red funciona perfectamente.", 
+                    "Cada router conoce el camino exacto hacia todos los demás nodos de la topología. La red funciona perfectamente.", 
                     "border-green"
                 );
                 isAnimating = false;
@@ -313,26 +341,29 @@
 
             costBL = "∞"; costBR = 16;
             
-            // Actualizar B
-            document.getElementById('val-b-L').innerHTML = `<span class="val-red">∞</span>`;
-            document.getElementById('val-b-R').innerHTML = `<span class="val-red">16</span>`;
-            flashRow('row-b-L'); flashRow('row-b-R');
+            // B pierde la ruta a C (pero su ruta a A sigue intacta)
+            document.getElementById('val-b-to-c-L').innerHTML = `<span class="val-red">∞</span>`;
+            document.getElementById('val-b-to-c-R').innerHTML = `<span class="val-red">16</span>`;
+            flashRow('row-b-to-c-L'); flashRow('row-b-to-c-R');
             
-            // Actualizar C
-            document.getElementById('val-c-L').innerHTML = `<span class="val-red">∞</span>`;
-            document.getElementById('val-c-R').innerHTML = `<span class="val-red">16</span>`;
-            flashRow('row-c-L'); flashRow('row-c-R');
+            // C queda completamente aislado, pierde ruta a A y a B
+            document.getElementById('val-c-to-a-L').innerHTML = `<span class="val-red">∞</span>`;
+            document.getElementById('val-c-to-a-R').innerHTML = `<span class="val-red">16</span>`;
+            document.getElementById('val-c-to-b-L').innerHTML = `<span class="val-red">∞</span>`;
+            document.getElementById('val-c-to-b-R').innerHTML = `<span class="val-red">16</span>`;
+            flashRow('row-c-to-a-L'); flashRow('row-c-to-a-R');
+            flashRow('row-c-to-b-L'); flashRow('row-c-to-b-R');
 
             updateNarrator(
                 "💥 ¡Se generó un error de comunicación!", 
-                "El cable físico entre B y C se ha reventado de repente. B y C detectan que perdieron conexión directa y marcan sus rutas como infinito (o 16). <b>¡Comienza el bucle!</b>", 
+                "El enlace B-C se reventó. C detecta que quedó aislado (todo en infinito). B detecta que perdió a C y marca esa ruta en específico como infinito. <b>¡Comienza el bucle!</b>", 
                 "border-red"
             );
             
             setTimeout(() => { isAnimating = false; }, 500);
 
         } else {
-            // FASE 3: BUCLE INFINITO ALGORÍTMICO (Con Sobres Animados)
+            // FASE 3: BUCLE INFINITO ALGORÍTMICO
             iter++;
             document.getElementById('iter-display').innerText = "Iteración RIP: " + iter;
             
@@ -347,15 +378,16 @@
                 if(!converged) pR.style.animation = "sendRight 0.6s ease-in-out forwards";
                 
                 setTimeout(() => {
+                    // Solo se altera la ruta hacia C, la de A->B sigue en 1
                     costBL = costAL + 1;
-                    document.getElementById('val-b-L').innerHTML = `<span class="val-red">${costBL}</span>`;
-                    flashRow('row-b-L');
+                    document.getElementById('val-b-to-c-L').innerHTML = `<span class="val-red">${costBL}</span>`;
+                    flashRow('row-b-to-c-L');
                     
                     if(!converged) {
                         costBR = costAR + 1;
                         if(costBR >= 16) costBR = 16;
-                        document.getElementById('val-b-R').innerHTML = costBR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costBR}</span>`;
-                        flashRow('row-b-R');
+                        document.getElementById('val-b-to-c-R').innerHTML = costBR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costBR}</span>`;
+                        flashRow('row-b-to-c-R');
                     }
                     
                     if(iter === 1) {
@@ -363,7 +395,7 @@
                     } else if (iter === 3) {
                         updateNarrator("📢 A anuncia su actualización a B — Segunda ronda.", `A le dice a B: <i>"Yo llego a C en ${costAL} saltos"</i>. B recalcula: <i>"${costAL} + 1 = <b>${costBL} saltos</b>"</i>. Cada anuncio infla el contador en +2. Ninguno detecta el ciclo.`, "border-yellow");
                     } else if(!converged) {
-                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube consumiendo ancho de banda.", "border-red");
+                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos hacia C sube consumiendo ancho de banda.", "border-red");
                     }
 
                     checkConvergence();
@@ -376,20 +408,20 @@
 
                 setTimeout(() => {
                     costAL = costBL + 1;
-                    document.getElementById('val-a-L').innerHTML = `<span class="val-red">${costAL}</span>`;
-                    flashRow('row-a-L');
+                    document.getElementById('val-a-to-c-L').innerHTML = `<span class="val-red">${costAL}</span>`;
+                    flashRow('row-a-to-c-L');
 
                     if(!converged) {
                         costAR = costBR + 1;
                         if(costAR >= 16) costAR = 16;
-                        document.getElementById('val-a-R').innerHTML = costAR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costAR}</span>`;
-                        flashRow('row-a-R');
+                        document.getElementById('val-a-to-c-R').innerHTML = costAR >= 16 ? `<span class="val-red">16</span>` : `<span class="val-red">${costAR}</span>`;
+                        flashRow('row-a-to-c-R');
                     }
 
                     if(iter === 2) {
                         updateNarrator("📢 B anuncia su nueva ruta a A.", `B le dice a A: <i>"Yo llego a C en ${costBL} saltos"</i>. A recibe esta actualización y recalcula. A piensa: <i>"B llega a C en ${costBL}, más 1 salto mío = <b>${costAL} saltos</b>"</i>. El ciclo vicioso ha comenzado.`, "border-yellow");
                     } else if(!converged) {
-                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles. Cada ronda, el número de saltos sube consumiendo ancho de banda.", "border-red");
+                        updateNarrator("🔄 ¡El bucle al infinito está en plena marcha!", "A y B siguen intercambiando rutas inútiles hacia C. Cada ronda el error se magnifica más.", "border-red");
                     }
 
                     checkConvergence();
@@ -410,7 +442,6 @@
             document.getElementById('btn-step').disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
             runStep();
-            // Ejecutar el resto de forma automática (con un intervalo seguro para la animación)
             timer = setInterval(() => {
                 if(!converged) runStep();
             }, 2500);
